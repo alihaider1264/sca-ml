@@ -1,0 +1,4 @@
+[submodule "Data-Collector"]
+	path = Data-Collector
+	url = https://github.com/alihaider1264/sca-ml.git
+	branch = Data-Collector
