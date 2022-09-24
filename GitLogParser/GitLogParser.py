@@ -15,7 +15,7 @@ import os
 import sys
 
 def load_commit_log(file):
-    with open(file, 'r') as f:
+    with open(file, 'r', encoding="utf8") as f:
         return f.read()
 
 def parse_commit_diff(diff):
