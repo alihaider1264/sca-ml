@@ -5,11 +5,21 @@ import GitLogParser.GitLogParser as GitLogParser
 import shutil
 import stat
 import json
+import time
+import errno, os, stat, shutil
+import subprocess
 
 #https://seart-ghs.si.usi.ch/
 
 
-
+#https://stackoverflow.com/questions/1213706/what-user-do-python-scripts-run-as-in-windows
+def handleRemoveReadonly(func, path, exc):
+  excvalue = exc[1]
+  if func in (os.rmdir, os.remove) and excvalue.errno == errno.EACCES:
+      os.chmod(path, stat.S_IRWXU| stat.S_IRWXG| stat.S_IRWXO) # 0777
+      func(path)
+  else:
+      raise
 
 def theLogParserPart(inpath,outpath):
     filesToParse = LogGen.searchFiles(inpath, ".gitlog")
@@ -32,11 +42,7 @@ def interfacer(repo,output,branch,submodules,multibranch,defJSON,usemethods,file
         exit()
     branches = GitDownloader.downloadRepo(repo, output+"\git", branch, multibranch, submodules)
     hashes = LogGen.logGen(fileformat, output+"\git\main", output+"\log\main", defJSON, usemethods,hashes)
-    gitpath = output + '\git'
-    try:
-        shutil.rmtree(gitpath)
-    except OSError as error:
-        print("error deleting!!! RUN AS ADMIN!!!")
+    gitpath = output + '\git\\'
 
     if multibranch is not False:
         for branch in branches:
@@ -50,6 +56,8 @@ def interfacer(repo,output,branch,submodules,multibranch,defJSON,usemethods,file
             hashes = LogGen.logGen(fileformat, output+"\git\\"+branch , output+"\log\\"+branch , defJSON, usemethods,hashes)
 
     theLogParserPart(output+"\log",output+"\parsed")
+
+    process1 = subprocess.run("rmdir "+ gitpath + "/s /q", shell=True)
     #else:
         #LogGen.main(repo, output, branch, defJSON)
 
@@ -62,7 +70,7 @@ def seartParse(repo,output,branch,submodules,multibranch,defJSON,usemethods,file
     for i in data['items']:
         gitname = i['name']
         gitrepo = "https://github.com/" + gitname + ".git"
-        interfacer(gitrepo,output+"\\"+gitname.split("/")[1],branch,submodules,multibranch,defJSON,usemethods,fileformat,False)
+        interfacer(gitrepo,output+"\\"+gitname.split("/")[1],branch,submodules,multibranch,defJSON,usemethods,fileformat,False,True)
         a = open(output+"\\"+gitname.split("/")[1]+"\gitinfo.txt", "w")
         a.write(json.dumps(i))
         a.close()
