@@ -16,7 +16,10 @@ import sys
 
 def load_commit_log(file):
     with open(file, 'r', encoding="utf8") as f:
-        return f.read()
+        try:
+            return f.read()
+        except:
+            return NULL
 
 def parse_commit_diff(diff):
     if (diff.startswith('-')):
@@ -61,16 +64,22 @@ def parse_commit_log(log):
 
 def mainArgs(output,logfile):
     log = load_commit_log(logfile)
+    if log == NULL:
+        return
     commits = parse_commit_log(log)
     #write commits to files
     os.makedirs(output, exist_ok=True)
     for i in range(len(commits)):
         print("test")
-        with open(output + "\\" + str(i) + '.txt', 'w') as f:
-            f.write(commits[i]['commitcontent'])
+        with open(output + "\\" + str(i) + '.txt', 'w',encoding="utf8") as f:
+            try:
+                f.write(commits[i]['commitcontent'])
+            except:
+                print("probably unicode error")
+                continue
         f.close
         commits[i].pop('commitcontent')
-        with open(output + str(i) + '.json', 'w') as f:
+        with open(output + str(i) + '.json', 'w',encoding="utf8") as f:
             f.write(str(commits[i]) + '\n')
         f.close
 

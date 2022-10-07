@@ -53,7 +53,10 @@ def generateLogs(filestodo,rootpath,outputpath,usemethods,hashes):
                 print("Generated logs for " + file + "[" + method + "]")
                 #opens log and checks if it's 0 bytes, if so, delete it
                 with open(outputpath +"\\" + outputname, 'r' , encoding="utf8") as f:
-                    data = f.read()
+                    try:
+                        data = f.read()
+                    except:
+                        continue
                     hash = hashlib.md5(data.encode('utf-8')).hexdigest()
                     print(hash)
                 if len(data) == 0:
@@ -68,9 +71,12 @@ def generateLogs(filestodo,rootpath,outputpath,usemethods,hashes):
                 incnumb += 1
         else:
             outputname = str(file).split("\\")[len(str(file).split("\\")) - 1].split(".")[0] +".gitlog"
-            process1 = subprocess.run("cd /d " + rootpath + " && git --no-pager log --no-notes --patch ." + file + " > "+ outputpath +"\\" +  outputname, shell=True)
+            process1 = subprocess.run("cd /d " + rootpath + " && git --no-pager log --no-notes --patch -U100000000000 ." + file + " > "+ outputpath +"\\" +  outputname, shell=True)
             with open(outputpath +"\\" + outputname, 'r' , encoding="utf8") as f:
-                data = f.read()
+                try:
+                    data = f.read()
+                except:
+                    continue
                 hash = hashlib.md5(data.encode('utf-8')).hexdigest()
                 print(hash)
             if len(data) == 0:
