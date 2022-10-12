@@ -58,6 +58,7 @@ def interfacer(repo,output,branch,submodules,multibranch,defJSON,usemethods,file
     theLogParserPart(output+"\log",output+"\parsed")
 
     process1 = subprocess.run("rmdir "+ gitpath + "/s /q", shell=True)
+    hashes = []
     #else:
         #LogGen.main(repo, output, branch, defJSON)
 
