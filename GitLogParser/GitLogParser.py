@@ -9,10 +9,19 @@
 #	- commit description
 #   - how many commits it's been since the first commit (again start at 0)
 
+
+
+
+#impliment a size limit, some bottleneck happens when the file is too large
+
+
 import argparse
 from asyncio.windows_events import NULL
 import os
 import sys
+
+fileSizeMax = 110000000
+useFileSizeMax = True
 
 def load_commit_log(file):
     with open(file, 'r', encoding="utf8") as f:
@@ -31,8 +40,10 @@ def parse_commit_log(log):
     commits = []
     current_commit = None
     incommit = False
-    current_file = None
     for line in log.split('\n'):
+        #skip the line if it has invalid characters
+        if not line.isascii():
+            continue
         if line.startswith('commit'):
             if current_commit != None:
                 commits.append(current_commit)
@@ -58,12 +69,16 @@ def parse_commit_log(log):
                     current_commit['description'] = str(current_commit['description']) + '\n' + str(line.strip())
         elif line.startswith('@@'):
             incommit = True
+        print(line)
     commits.append(current_commit)
     return commits
 
 
 def mainArgs(output,logfile):
     log = load_commit_log(logfile)
+    if len(log) > fileSizeMax and useFileSizeMax:
+        print('File is too large')
+        return
     if log == NULL:
         return
     commits = parse_commit_log(log)
