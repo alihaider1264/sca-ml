@@ -1,0 +1,15 @@
+A .pysimp file is a python file that has had pythonSimplierizer run on it. This makes the following changes
+
+User defined functions have their names changed to "functionToken functionNumber" where functionNumber is a unique sequential number for each function. This is done to prevent name collisions when the code is combined with other code. 
+
+User defined classes have their names changed to "classToken classNumber" where classNumber is a unique sequential number for each class. This is done to prevent name collisions when the code is combined with other code.
+
+User defined variables have their names changed to "argTokens argNumber" where argNumber is a unique sequential number for each variable. This is done to prevent name collisions when the code is combined with other code. While it may be confusing to have variables called arg 1, arg 2, etc. it is important to note that these variables are not arguments to a function. They are simply variables that are defined in the code. This is how they are defined in Carbon.
+
+User defined 
+
+
+
+
+
+While these changes leave the code where it can't be run, by removing the space between the toekens and the function numbers should allow the code to be run again. This is done to simplify the tokenization process.
