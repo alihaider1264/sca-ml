@@ -8,7 +8,10 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "program": "${file} -r C:\\Users\\Mcall\\Desktop\\pythonProjects.json -o D:\\PythonTest -se -p -l python -d C:\\Users\\Mcall\\Desktop\\CSIT499-Fall2022-MilesCalloway\\Data-Collector\\LogGenerator\\fileformats.JSON -nd",
+            "program": "${file}",
+            //"args" : ["--l", "C:\\Users\\Mcall\\Desktop\\utils.gitlog", "--o", "C:\\Users\\Mcall\\Desktop\\test\\output.txt"],
+            "args" : ["--l", "C:\\Users\\Mcall\\Desktop\\api.gitlog", "--o", "C:\\Users\\Mcall\\Desktop\\test\\output.txt"],
+
             "console": "integratedTerminal",
             "justMyCode": true
         }

@@ -1,4 +1,5 @@
 import argparse
+from operator import ilshift
 import LogGenerator.GitDownloader as GitDownloader
 import LogGenerator.LogGen as LogGen
 import GitLogParser.GitLogParser as GitLogParser
@@ -11,7 +12,9 @@ import subprocess
 
 #https://seart-ghs.si.usi.ch/
 
-
+checkForExsistingCollection = True
+multiThreading = True
+maxThreads = 25
 #https://stackoverflow.com/questions/1213706/what-user-do-python-scripts-run-as-in-windows
 def handleRemoveReadonly(func, path, exc):
   excvalue = exc[1]
@@ -24,6 +27,7 @@ def handleRemoveReadonly(func, path, exc):
 def theLogParserPart(inpath,outpath):
     filesToParse = LogGen.searchFiles(inpath, ".gitlog")
     pathToOutput = "#todo"
+    print(filesToParse)
     #mimic file structure of initial folder in output folder with an additional folder for each log named after the log.
     for i in filesToParse:
         pathToOutput = outpath + i.split(".gitlog")[0] + "\\"
@@ -63,11 +67,44 @@ def interfacer(repo,output,branch,submodules,multibranch,defJSON,usemethods,file
         #LogGen.main(repo, output, branch, defJSON)
 
 
+def checkForExsisting(data,output):
+    for i in os.listdir(output):
+        for j in data['items']:
+            if (i == j['name'].split("/")[1]):
+                #Check to see if it has a git folder
+                if (os.path.exists(output+"\\"+i+"\\git")):
+                    #delete the git folder
+                    print("Deleting " + output+"\\"+i+"\\git")
+                    process1 = subprocess.run("rmdir "+ output+"\\"+i+"\\git" + "/s /q", shell=True)
+                    # shutil.rmtree(output+"\\"+i+"\\git", onerror=handleRemoveReadonly)
+                    break
+                else:
+                    print("Skipping " + j['name'].split("/")[1])
+                    data['items'].remove(j)
+                #Check to see if theere is a gitinfo.txt
+                if ((not os.path.exists(output+"\\"+i+"\\gitinfo.txt")) and os.path.exists(output+"\\"+i)):
+                    #generate a new gitinfo.txt
+                    gitname = j['name']
+                    a = open(output+"\\"+gitname.split("/")[1]+"\gitinfo.txt", "w")
+                    a.write(json.dumps(j))
+                    a.close()
+                    print('Generating new gitinfo.txt for ' + i)
+                break
+    return data
+
+
 def seartParse(repo,output,branch,submodules,multibranch,defJSON,usemethods,fileformat,seart):
     f = open(repo, encoding="utf8")
     # returns JSON object as
     # a dictionary
+    if (multiThreading):
+        seartParseMultithreaded(repo,output,branch,submodules,multibranch,defJSON,usemethods,fileformat,seart)
+        return
+
     data = json.load(f)
+    if (checkForExsistingCollection):
+        data = checkForExsisting(data,output)
+
     for i in data['items']:
         gitname = i['name']
         gitrepo = "https://github.com/" + gitname + ".git"
@@ -76,6 +113,35 @@ def seartParse(repo,output,branch,submodules,multibranch,defJSON,usemethods,file
         a.write(json.dumps(i))
         a.close()
     f.close()
+
+
+def seartParseMultithreaded(repo,output,branch,submodules,multibranch,defJSON,usemethods,fileformat,seart):
+    import threading
+    import queue
+    f = open(repo, encoding="utf8")
+    # returns JSON object as
+    # a dictionary
+
+    data = json.load(f)
+
+    if (checkForExsistingCollection):
+        data = checkForExsisting(data,output)
+
+    for i in data['items']:
+        gitname = i['name']
+        gitrepo = "https://github.com/" + gitname + ".git"
+        #make the dir if it doesnt exist
+        if (not os.path.exists(output+"\\"+gitname.split("/")[1])):
+            os.mkdir(output+"\\"+gitname.split("/")[1])
+        t = threading.Thread(target=interfacer, args=(gitrepo,output+"\\"+gitname.split("/")[1],branch,submodules,multibranch,defJSON,usemethods,fileformat,False,True))
+        a = open(output+"\\"+gitname.split("/")[1]+"\gitinfo.txt", "w")
+        a.write(json.dumps(i))
+        a.close()
+        while (threading.active_count() > maxThreads):
+            time.sleep(1)
+        t.start()
+    f.close()
+
 
 
 def main():

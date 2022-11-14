@@ -21,14 +21,16 @@ def getExtensions(db, language):
     return None
 
 def searchFiles(path, fileformats):
-    
     filesToDo = []
     for root, dirs, files in os.walk(path):
         for file in files:
+            addedfile = False
             for fileformat in fileformats:
                 if file.endswith(fileformat):
                     #code to generate a list of paths of files to generate logs for
-                    filesToDo.append(os.path.join(root, file).removeprefix(path))
+                    if not addedfile: 
+                        filesToDo.append(os.path.join(root, file).removeprefix(path))
+                        addedfile = True
     return filesToDo
 
 def generateLogs(filestodo,rootpath,outputpath,usemethods,hashes): 
@@ -49,7 +51,7 @@ def generateLogs(filestodo,rootpath,outputpath,usemethods,hashes):
                 break
             for method in methods:
                 outputname = str(file).split("\\")[len(str(file).split("\\")) - 1].split(".")[0] +"["+method+"].gitlog"
-                process1 = subprocess.run("cd /d " + rootpath + " && git --no-pager log --no-notes -L :" + method + ":." + file + " > "+ outputpath +"\\" +  outputname, shell=True)
+                process1 = subprocess.run("cd /d " + rootpath + " && git --no-pager log --no-notes -L :" + method + ":\"." + file + "\"" + " > "+ outputpath +"\\" +  outputname , shell=True)
                 print("Generated logs for " + file + "[" + method + "]")
                 #opens log and checks if it's 0 bytes, if so, delete it
                 with open(outputpath +"\\" + outputname, 'r' , encoding="utf8") as f:
@@ -71,7 +73,7 @@ def generateLogs(filestodo,rootpath,outputpath,usemethods,hashes):
                 incnumb += 1
         else:
             outputname = str(file).split("\\")[len(str(file).split("\\")) - 1].split(".")[0] +".gitlog"
-            process1 = subprocess.run("cd /d " + rootpath + " && git --no-pager log --no-notes --patch -U100000000000 ." + file + " > "+ outputpath +"\\" +  outputname, shell=True)
+            process1 = subprocess.run("cd /d " + rootpath + " && git --no-pager log --no-notes --patch -U100000000000 \"." + file + "\"" + " > "+ outputpath +"\\" +  outputname, shell=True)
             with open(outputpath +"\\" + outputname, 'r' , encoding="utf8") as f:
                 try:
                     data = f.read()

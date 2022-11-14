@@ -69,17 +69,16 @@ def parse_commit_log(log):
                     current_commit['description'] = str(current_commit['description']) + '\n' + str(line.strip())
         elif line.startswith('@@'):
             incommit = True
-        print(line)
     commits.append(current_commit)
     return commits
 
 
 def mainArgs(output,logfile):
     log = load_commit_log(logfile)
+    if log == NULL:
+        return
     if len(log) > fileSizeMax and useFileSizeMax:
         print('File is too large')
-        return
-    if log == NULL:
         return
     commits = parse_commit_log(log)
     #write commits to files
