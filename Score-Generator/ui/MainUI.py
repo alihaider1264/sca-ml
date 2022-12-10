@@ -18,13 +18,15 @@ models = []
 tokenizers = []
 modelInfos = []
 modelsDIR = "D:\\models\\python\\"
-modelNames = ["python_model_1_IMPROVED", "python_model_1_Similar"]
-modelSimilarized = [False, False]
+modelNames = ["python_model_1_IMPROVED", "python_model_1_Similar", "python_model_2_Similar"]
+modelSimilarized = [False, True, False]
 nextFileID = 0
 grades = []
 
 gradeDataFrame = pd.DataFrame()
 
+import traceback
+ERROR = ''
 
 import ast
 import autopep8
@@ -96,7 +98,7 @@ def change_names(code):
     elif isinstance(node, ast.Call):
       if isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name) and node.func.value.id in names:
         node.func.value.id = names[node.func.value.id]
-        node.func.attr = names[node.func.attr]
+        #node.func.attr = names[node.func.attr]
       # Add this block to rename calls to functions defined inside the class
       elif isinstance(node.func, ast.Name) and node.func.id in names:
         node.func.id = names[node.func.id]
@@ -154,6 +156,7 @@ def stringPadding(dataSet):
 
 
 def gradeString(string):
+    import traceback
     grades = []
     i = 0
     for model in models:
@@ -167,12 +170,14 @@ def gradeString(string):
             stringtmp = pad_sequences(stringtmp, maxlen=modelInfos[i]['maxLen'])
             print(stringtmp)
             grades.append(model.predict(stringtmp)[0][0])
-            i = i + 1
             del(stringtmp)
         except:
             #pop up qt message box
             print("Error")
             grades.append(-1)
+            global ERROR
+            ERROR = traceback.format_exc()
+        i += 1
     return grades
     
 
@@ -357,9 +362,18 @@ class Ui_MainWindow(object):
                         self.popUp = QtWidgets.QWidget()
                         self.popUp.resize(400, 200)
                         self.popUp.setWindowTitle("Grade Error")
-                        self.popUpLabel = QtWidgets.QLabel(self.popUp)
-                        self.popUpLabel.setText("The grading for " + fileName + " has encountered an error. Please make sure that the code contains no syntax errors and that the code is formatted correctly.")
+                        
+                        self.scrollArea = QtWidgets.QScrollArea(self.popUp)
+                        self.scrollArea.setGeometry(QtCore.QRect(0, 0, 400, 200))
+                        self.scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+                        self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+                        
+                        self.popUpLabel = QtWidgets.QLabel(self.scrollArea)
+                        self.popUpLabel.setText("The grading for " + fileName + " has encountered an error. Please make sure that the code contains no syntax errors and that the code is formatted correctly. \n \n Console output: \n" + ERROR) 
                         self.popUp.show()
+                        #enable scrolling of the text
+                        self.popUpLabel.setWordWrap(False)
+                        
                 print (fileName)
                 tempDF = pd.DataFrame([[fileName, grades, fileID]], columns = ['fileName', 'grades', 'fileID'])
                 global gradeDataFrame
