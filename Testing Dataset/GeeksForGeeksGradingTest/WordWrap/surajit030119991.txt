@@ -1,0 +1,33 @@
+#User function Template for python3
+import sys 
+
+INT_MAX = sys.maxsize
+
+class Solution:
+    def solveWordWrap(self, nums, k):
+        #Code here
+        n = len(nums)
+        
+        dp = [-1] * n
+        dp[n-1] = 0
+        
+        for i in range(n-2, -1, -1):
+            dp[i] = INT_MAX
+            curr_len = -1
+            for j in range(i, n):
+                curr_len += 1 + nums[j] 
+                
+                if curr_len > k:
+                    break 
+                
+                cost = 0
+                if j == n - 1:
+                    cost = 0
+                else:
+                    cost = (k - curr_len) * (k-curr_len) + dp[j+1]
+                    
+                if cost < dp[i]:
+                    dp[i] = cost 
+                    
+        return dp[0]
+        

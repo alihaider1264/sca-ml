@@ -1,0 +1,28 @@
+#User function Template for python3
+
+class Solution:
+    def minInsAndDel(self, nums, nums2, M, N):
+        dp = [-1] * M
+        dp[-1] = 1
+        #loops starts from the second last element
+        def LIS(nums):
+            tails = [0] * len(nums)
+            size = 0
+            for x in nums:
+                i, j = 0, size
+                while i != j:
+                    m = (i + j) // 2
+                    if tails[m] < x:
+                        i = m + 1
+                    else:
+                        j = m
+                tails[i] = x
+                size = max(i + 1, size)
+            return size
+        s = []
+        temp = set(nums2)
+        for i in nums:
+            if i in temp:
+                s.append(i)
+        res = LIS(s)
+        return M + N - (2*res)

@@ -1,0 +1,21 @@
+#User function Template for python3
+
+class Solution:
+    def fun(self,i,rem,arr,k,dp):
+        if i==len(arr):
+            return 0
+        
+        if dp[i][rem]!=-1: return dp[i][rem]
+        
+        if arr[i]>rem:
+            ans=((rem+1)**2)+self.fun(i+1,k-arr[i]-1,arr,k,dp)
+        else:
+            nextline=((rem+1)**2)+self.fun(i+1,k-arr[i]-1,arr,k,dp)
+            sameline=self.fun(i+1,rem-arr[i]-1,arr,k,dp)
+            ans=min(nextline,sameline)
+        dp[i][rem]=ans
+        return dp[i][rem]
+    
+    def solveWordWrap(self, nums, k):
+        dp=[[-1 for i in range(2006)]for j in range(505)]
+        return self.fun(0,k,nums,k,dp)

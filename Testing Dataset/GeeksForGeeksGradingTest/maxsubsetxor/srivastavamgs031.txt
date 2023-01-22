@@ -1,0 +1,19 @@
+# function to return maximum XOR subset in set[]
+
+class Solution:
+    def maxSubarrayXOR(self, arr, N):
+        # add code her
+        if N==0:
+            return 0
+        num=0
+        while True:
+            mx = -1000000
+            for i in range(N):
+                if mx<arr[i]:
+                    mx = arr[i]
+            if mx==0:
+                return num
+            num = max(num,num^mx)
+            for i in range(N):
+                arr[i] = min(arr[i],arr[i]^mx)
+                

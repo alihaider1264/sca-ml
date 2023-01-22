@@ -1,0 +1,19 @@
+#User function Template for python3
+from bisect import bisect_left
+class Solution:
+    def minInsAndDel(self, A, B, N, M):
+        s = set(B)
+        x = []
+        y = 0
+        for i in range(N):
+            if A[i] in B:
+                a = bisect_left(x, A[i])
+                if a == y:
+                    x.append(A[i])
+                    y += 1
+                else:
+                    x[a] = A[i]
+        z = 2*len(x)
+        return (N + M) - z
+        
+        # code here 

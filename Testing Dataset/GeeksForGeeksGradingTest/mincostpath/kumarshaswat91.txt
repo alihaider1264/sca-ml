@@ -1,0 +1,31 @@
+from heapq import *
+class Solution:
+    
+    #Function to return the minimum cost to react at bottom
+    #right cell from top left cell.
+    def is_valid(self, ch, visited, N):
+        if ch[0]<0 or ch[1]<0 or ch[0]>=N or ch[1]>=N or visited[ch[0]][ch[1]]==1:
+            return False
+        return True
+        
+    def minimumCostPath(self, grid):
+        #Code here
+        u, v = 0,0
+        distance = [[1000000000 for j in range(len(grid))] for i in range(len(grid))]
+        visited = [[0 for j in range(len(grid))] for i in range(len(grid))]
+        
+        bag=[]
+        distance[0][0] = grid[0][0]
+        heappush(bag, [distance[0][0], [u,v]])
+        
+        while bag:
+            d, n = heappop(bag)
+            visited[n[0]][n[1]] = 1
+            for x,y in [[1,0], [0,1], [-1,0], [0,-1]]:
+                if self.is_valid([x+n[0], y+n[1]], visited, len(grid)):
+                    curr = distance[n[0]][n[1]]+grid[n[0]+x][n[1]+y]
+                    if curr < distance[n[0]+x][n[1]+y]:
+                        distance[n[0]+x][n[1]+y] = curr
+                        heappush(bag, [curr, [n[0]+x, n[1]+y]])
+
+        return distance[len(grid)-1][len(grid)-1]

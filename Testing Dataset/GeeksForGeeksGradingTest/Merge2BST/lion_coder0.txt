@@ -1,0 +1,85 @@
+#User function Template for python3
+
+'''
+class Node:
+    def __init__(self, val):
+        self.right = None
+        self.data = val
+        self.left = None
+'''
+
+class Solution:
+    
+    #Function to return a list of integers denoting the node 
+    #values of both the BST in a sorted order.
+    
+    def merge(self, root1, root2):
+        #code here.
+        
+        st1=deque()
+        st2=deque()
+        current1=root1
+        current2=root2
+        ans=[]
+        # itertive inorder traversal
+        while(1):
+            
+            # process  1st bst
+            while(current1!=None):
+                
+                st1.append(current1)
+                current1=current1.left
+                
+            
+            # process  2 nd bst
+            while(current2!=None):
+                
+                st2.append(current2)
+                current2=current2.left
+                
+            
+            # if both are not empty at same time 
+            if(st1 and st2):
+                nd1=st1.pop()
+                nd2=st2.pop()
+                
+                if(nd1.data >= nd2.data):
+                    current2=nd2.right
+                    
+                    # as this element is bigger so we have to keep it till we have found element greater than this 
+                    st1.append(nd1)
+                    ans.append(nd2.data)
+                    
+                
+                else :
+                    current1=nd1.right
+                    
+                    # as this element is bigger so we have to keep it till wwe have found element greater than this 
+                    st2.append(nd2)
+                    ans.append(nd1.data)
+                    
+            # if st1 empty  and st2 is not empty THNE WE  will process only bst2 
+            elif(not st1 and st2):
+                
+                nd2=st2.pop()
+
+                current2=nd2.right
+                
+                ans.append(nd2.data)
+                
+                
+            # if st1 not empty then we will process only bst1
+            elif(not st2 and st1):
+                
+                nd1=st1.pop()
+                current1=nd1.right
+                ans.append(nd1.data)
+                
+            else: # if both are empty   
+                
+                break
+        
+        print("")
+        return ans
+        
+        

@@ -1,0 +1,23 @@
+#User function Template for python3
+
+class Solution:
+    def minInsAndDel(self, A, B, N, M):
+        t = []
+        B = set(B)
+        for a in A:
+            if a in B:
+                if len(t) == 0 or t[-1] < a:
+                    t.append(a)
+                else:
+                    i = self.binary_search(t, a, 0, len(t)-1)
+                    t[i+1] = a
+        return N + M - 2 * len(t)
+    
+    def binary_search(self, t, a, l, h):
+        if l > h:
+            return h
+        mid = (l + h) // 2
+        if t[mid] < a:
+            return self.binary_search(t, a, mid+1, h)
+        else:
+            return self.binary_search(t, a, l, mid-1)

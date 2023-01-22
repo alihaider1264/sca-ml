@@ -1,0 +1,13 @@
+# function to return maximum XOR subset in set[]
+
+class Solution:
+    def maxSubsetXOR(self, arr, N):
+        x = 0
+        while True:
+            y = max(arr)
+            if y == 0:
+                return x
+        # y has the leading 1 in the array
+            x = max(x, x ^ y)
+        # eliminate
+            arr = [min(z, z ^ y) for z in arr]

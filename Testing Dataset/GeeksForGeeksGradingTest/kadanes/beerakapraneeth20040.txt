@@ -1,0 +1,22 @@
+#User function Template for python3
+
+class Solution:
+    ##Complete this function
+    #Function to find the sum of contiguous subarray with maximum sum.
+    def maxSubArraySum(self,arr,N):
+        arr=arr
+        n=N
+        su=0
+        ma=-1000000000000000
+        start=0
+        end=0
+        for k in range(0,n):
+            su+=arr[k]
+            ma=max(ma,su)
+            if su>=0:
+                end+=1
+            else:
+                start=k
+                end=k
+        return ma
+                

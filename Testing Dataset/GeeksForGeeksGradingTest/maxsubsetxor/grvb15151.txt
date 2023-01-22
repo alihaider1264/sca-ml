@@ -1,0 +1,41 @@
+#User function Template for python3
+class Solution:
+    def maxXor(self, a, n):
+        BITS = 32
+        ind = 0
+        offset = 0
+        
+        for offset in range(BITS-1, -1, -1):
+            maxInd = ind
+            
+            maxVal = -1
+            for i in range(ind, n):
+                val = a[i]
+                if (val > 0 and ((1 << offset) & val) != 0 and val > maxVal):
+                    maxVal = val
+                    maxInd = i
+            if maxVal == -1:
+                continue
+            
+            temp = a[ind]
+            a[ind] = a[maxInd]
+            a[maxInd] = temp
+            
+            maxInd = ind
+            for j in range(n):
+                val = a[j]
+                if j != maxInd and ((1 << offset) & val) != 0:
+                    a[j] = val ^ a[maxInd]
+            ind += 1
+        res = 0
+        for item in a:
+            res = res ^ item
+        return res 
+                
+                    
+                    
+            
+            
+            
+            
+        # code here

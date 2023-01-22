@@ -1,0 +1,56 @@
+from collections import deque
+# from time import time
+
+def get_neighboring_indices(n, m, i, j):
+    if 0 < i < n-1 and  0 < j < m-1:
+        return ((i-1,j),(i+1,j),(i,j-1),(i,j+1))
+
+    neighboring_indices = []
+    if i > 0:
+        neighboring_indices.append((i - 1, j))
+    if j > 0:
+        neighboring_indices.append((i, j - 1))
+    if i < n - 1:
+        neighboring_indices.append((i + 1, j))
+    if j < m - 1:
+        neighboring_indices.append((i, j + 1))
+    return tuple(neighboring_indices)
+
+class Solution:
+    
+    #Function to return the minimum cost to react at bottom
+    #right cell from top left cell.
+    def minimumCostPath(self, grid):
+       # start = time()
+        N = len(grid)
+        cum_cost = [[1000*500*500+1]*N for _ in range(N)]
+        cum_cost[0][0] = grid[0][0]
+        queue = deque([(0,0)])
+        upper_bound = max([sum([grid[row][i] for i in range(N)])
+        + sum([grid[i][0] for i in range(row)]) 
+        +  sum([grid[i][-1] for i in range(row + 1,N)]) for row in range(N)])
+#         print(upper_bound)
+        to_check = dict.fromkeys([(i,j) for i in range(N) for j in range(N)], 0)
+        to_check[(0,0)] = 1
+        while queue:
+            i, j = queue.popleft()
+            neighboring_indices = get_neighboring_indices(N,N,i,j)
+            for ni, nj in neighboring_indices:
+              #  if cum_cost[ni][nj] is None:
+              #      cum_cost[ni][nj] = cur_val + grid[ni][nj]
+              #      if not to_check[(ni, nj)]:
+              #          queue.append((ni,nj))
+              #          to_check[(i,j)] = 1
+                new = cum_cost[i][j] + grid[ni][nj]
+                if new < cum_cost[ni][nj]:
+                    cum_cost[ni][nj] = new
+                    if not to_check[(ni, nj)]:
+                        if cum_cost[ni][nj] <= upper_bound:
+                            queue.append((ni,nj))
+                            to_check[(i,j)] = 1
+            to_check[(i,j)] = 0
+        
+#         end = time()
+#         print(end - start)
+    
+        return cum_cost[-1][-1]

@@ -1,0 +1,35 @@
+#User function Template for python
+from collections import Counter
+from functools import lru_cache
+
+from bisect import bisect
+class Solution:
+    def minInsAndDel(self, A1, B, N, M):
+        # code here 
+        dc=Counter(B)
+        ans=0
+        A=[]
+        for nm in A1:
+            if dc[nm]>0:
+                A.append(nm)
+                ans=1
+        #print(A,B)
+        
+        n=len(A)
+        
+        dp=[1]*n
+       
+        final=[]
+        for i in range(n):
+            pos=bisect(final,A[i])
+            
+            if pos==len(final):
+                final.append(A[i])
+            
+            else:
+                final[pos]=A[i]
+            
+        if len(final):
+            ans=len(final)
+            
+        return len(A1)+len(B)-2*ans

@@ -1,0 +1,29 @@
+
+
+#User function Template for python3
+class Solution:
+    def __init__(self):
+        self.MAX=100001
+        
+    #Function to return the minimum cost to react at bottom
+    #right cell from top left cell.
+    def minimumCostPath(self, grid):
+        #Code here
+        N=len(grid)
+        i=j=N-1
+        hold=self.dfs(i,j,grid,N)
+        return hold
+
+    def dfs(self,i,j,grid,N):
+        value = grid[i][j]
+        if(i==0 and j==0):
+            return value
+        if(i<0 or j<0):
+            return self.MAX
+        up = self.dfs(i-1,j,grid,N)
+        left = self.dfs(i,j-1,grid,N)
+        #print(i,j,f"{value}+min({up},{left})",value+min(up,left))
+        return value+min(up,left)
+
+        
+

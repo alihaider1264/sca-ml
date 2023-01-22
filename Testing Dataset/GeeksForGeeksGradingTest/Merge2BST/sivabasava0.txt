@@ -1,0 +1,59 @@
+#User function Template for python3
+
+'''
+class Node:
+    def __init__(self, val):
+        self.right = None
+        self.data = val
+        self.left = None
+'''
+
+class Solution:
+    
+    #Function to return a list of integers denoting the node 
+    #values of both the BST in a sorted order.
+    def merge(self, root1, root2):
+        #code here.
+        result = []
+        def in_order(node):
+            if node is None: 
+                return
+            yield from in_order(node.left)
+            yield node.data
+            yield from in_order(node.right)
+            
+        done1 = False
+        done2 = False
+        b1 = None
+        s1 = in_order(root1)
+        s2 = in_order(root2)
+        b2 = None
+        while done1 != True and done2!=True:
+            try:
+                if b1 is None:
+                    b1 = next(s1)
+            except StopIteration as e:
+                done1 = True
+            try:
+                if b2 is None:
+                    b2 = next(s2)
+            except StopIteration as e:
+                done2 = True
+            if b1 is None and b2 is None: break
+            
+            if b1 is not None and b2 is not None:
+                    if b1 < b2:
+                        result.append(b1)
+                        b1 = None
+                    else:
+                        result.append(b2)
+                        b2 = None
+            else:
+                if b1 is None and b2 is not None:
+                    result.append(b2)
+                    b2 = None
+                else:
+                    result.append(b1)
+                    b1 = None
+            
+        return result

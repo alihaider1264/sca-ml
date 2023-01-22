@@ -1,0 +1,26 @@
+import bisect
+class Solution:
+    
+    #Function to return the minimum cost to react at bottom
+    #right cell from top left cell.
+    def minimumCostPath(self, grid):
+        #Code here
+        #visited=[[False for i in range(len(grid[0]))] for j in range(len(grid))]
+        ans=[[10**9 for i in range(len(grid[0]))] for j in range(len(grid))]
+        st=[[0,0,0]]
+        ans[0][0]=grid[0][0]
+        while st:
+            #print(st)
+            z,x,y=st[0]
+            del st[0]
+            for i,j in [[0,1],[1,0],[0,-1],[-1,0]]:
+                if -1<i+x<len(grid) and -1<j+y<len(grid[0]) and ans[i+x][j+y]>z+grid[x][y]:
+                    if ans[i+x][j+y]!=10**9:
+                        del st[st.index([ans[i+x][j+y],i+x,j+y])]
+                    ans[i+x][j+y]=z+grid[x][y]
+                    bisect.insort(st,[z+grid[x][y],i+x,j+y])
+        
+        
+        return ans[-1][-1]+grid[-1][-1]
+                
+            

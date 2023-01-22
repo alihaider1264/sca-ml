@@ -1,0 +1,48 @@
+from queue import PriorityQueue
+from time import time
+
+def get_neighboring_indices(n, m, i, j):
+    if 0 < i < n - 1 and 0 < j < m - 1:
+        return ((i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1))
+
+    neighboring_indices = []
+    if i > 0:
+        neighboring_indices.append((i - 1, j))
+    if j > 0:
+        neighboring_indices.append((i, j - 1))
+    if i < n - 1:
+        neighboring_indices.append((i + 1, j))
+    if j < m - 1:
+        neighboring_indices.append((i, j + 1))
+    return tuple(neighboring_indices)
+
+
+class Solution:
+
+    # Function to return the minimum cost to react at bottom
+    # right cell from top left cell.
+    def minimumCostPath(self, grid):
+        start = time()
+        N = len(grid)
+        cum_cost = [[1000 * 500 * 500 + 1] * N for _ in range(N)]
+        cum_cost[0][0] = grid[0][0]
+        queue = PriorityQueue()
+        queue.put((grid[0][0], 0, 0))
+        while not queue.empty():
+            _, i, j = queue.get()
+            # print(i,j,cum_cost[i][j])
+            neighboring_indices = get_neighboring_indices(N, N, i, j)
+            for ni, nj in neighboring_indices:
+                new = cum_cost[i][j] + grid[ni][nj]
+                if new < cum_cost[ni][nj]:
+                    if (ni, nj) == (N-1, N-1):
+                        # end = time()
+                        # print(end - start)
+                        return new
+                    else:
+                        cum_cost[ni][nj] = new
+                        queue.put((cum_cost[ni][nj], ni, nj))
+
+        # end = time()
+        # print(end - start)
+        return cum_cost[-1][-1]

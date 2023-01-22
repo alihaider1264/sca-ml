@@ -1,0 +1,35 @@
+t=int(input())
+for _ in range(t):
+    n=int(input())
+    ele=list(int(n) for n in input().split())
+    
+    Max_Bit=32 
+    
+    index=0
+    for i in range(Max_Bit-1,-1,-1):
+        maxIndex=index
+        maxEle=-9999
+        
+        for j in range(index,n):
+            
+            if((ele[j] &(1<<i)) !=0 and ele[j]>maxEle):
+                maxIndex=j
+                maxEle=ele[j]
+        
+        if(maxEle==-9999):
+            continue 
+    
+        ele[index],ele[maxIndex]=ele[maxIndex],ele[index]
+        
+        maxIndex=index
+        
+        for j in range(n):
+            if(j!=maxIndex and (ele[j] & (1<<i)) !=0):
+                ele[j]=ele[j]^ele[maxIndex]
+                
+        index=index+1       
+    res=0
+    for i in range(n):
+        res=res^ele[i]
+    print(res)        
+                

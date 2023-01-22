@@ -1,0 +1,55 @@
+#User function Template for python3
+
+'''
+class Node:
+    def __init__(self, val):
+        self.right = None
+        self.data = val
+        self.left = None
+'''
+
+class Solution:
+    
+    def initialise(self, root, stk):
+        if root is None:
+            return
+        stk.append(root)
+        self.initialise(root.left, stk)
+    
+    def helper(self, stk1, stk2, arr):
+        
+        while len(stk1) > 0 and len(stk2) > 0:
+            
+        # check top
+            if stk1[len(stk1)-1].data < stk2[len(stk2)-1].data:
+                s = stk1.pop()
+                arr.append(s.data)
+                self.initialise(s.right, stk1)
+            else:
+                s = stk2.pop()
+                arr.append(s.data)
+                self.initialise(s.right, stk2)
+        if len(stk1) > 0:
+            while len(stk1) > 0:
+                s = stk1.pop()
+                arr.append(s.data)
+        if len(stk2) > 0:
+            while len(stk2) > 0:
+                s = stk2.pop()
+                arr.append(s.data)
+                
+         
+        
+    
+    #Function to return a list of integers denoting the node 
+    #values of both the BST in a sorted order.
+    def merge(self, root1, root2):
+        #code here.
+        stk1 = []
+        stk2 = []
+        self.initialise(root1, stk1)
+        self.initialise(root2, stk2)
+        arr = []
+        self.helper(stk1, stk2, arr)
+        return arr
+        

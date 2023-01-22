@@ -1,0 +1,83 @@
+#User function Template for python3
+
+'''
+class Node:
+    def __init__(self, val):
+        self.right = None
+        self.data = val
+        self.left = None
+'''
+
+class Solution:
+    
+    #Function to return a list of integers denoting the node 
+    #values of both the BST in a sorted order.
+    def merge(self, root1, root2):
+        
+        st1 = []
+        st2 = []
+        
+        result = []
+        
+        while (root1 is not None or len(st1) > 0) and (root2 is not None or len(st2)>0):
+            
+            while root1:
+                st1.append(root1)
+                root1 = root1.left
+            
+            while root2:
+                st2.append(root2)
+                root2 = root2.left
+            
+            root1 = st1[-1]
+            root2 = st2[-1]
+            
+            if root1.data < root2.data:
+                result.append(root1.data)
+                st1.pop(-1)
+                root2 = None
+                root1 = root1.right
+            elif root1.data > root2.data:
+                result.append(root2.data)
+                st2.pop(-1)
+                root1 = None
+                root2 = root2.right
+            else:
+                result.append(root1.data)
+                result.append(root2.data)
+                st1.pop(-1)
+                st2.pop(-1)
+                root1 = root1.right
+                root2 = root2.right
+        while len(st1) > 0:
+            
+            while root1:
+                st1.append(root1)
+                root1 = root1.left
+            root1 = st1[-1]
+            st1.pop(-1)
+            result.append(root1.data)
+            root1 = root1.right
+        while len(st2) > 0:
+            
+            while root2:
+                st2.append(root2)
+                root2 = root2.left
+            root2 = st2[-1]
+            st2.pop(-1)
+            result.append(root2.data)
+            root2 = root2.right
+        if root1:
+            result.append(root1.data)
+        if root2:
+            result.append(root2.data)
+        return result
+
+                
+            
+        
+    
+            
+        
+        
+        #code here.

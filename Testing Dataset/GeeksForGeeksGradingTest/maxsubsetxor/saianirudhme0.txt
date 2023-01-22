@@ -1,0 +1,35 @@
+# function to return maximum XOR subset in set[]
+import math
+class Solution:
+    def maxSubsetXOR(self, arr, N):
+        # add code here
+    
+        r=0
+        ind=0
+        for i in range(31,-1,-1):
+            mx=-2147483648
+            y=ind
+            for x in range(ind,N):
+                if (arr[x] & 1<<i) and arr[x]>mx:
+                    mx=arr[x]
+                    y=x
+            if mx==-2147483648:
+                continue
+            arr[ind],arr[y]=arr[y],arr[ind]
+            y=ind
+            for x in range(y+1,N):
+                if arr[x] & 1<<i and x!=y:
+                    arr[x]=arr[x] ^ mx
+            ind+=1
+        r=0
+        for i in arr:
+            r=r ^ i
+        
+        return r
+            
+                    
+                
+                
+            
+            
+            

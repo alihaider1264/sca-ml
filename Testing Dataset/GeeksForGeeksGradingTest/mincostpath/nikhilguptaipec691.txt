@@ -1,0 +1,26 @@
+import heapq
+class Solution:
+    
+    #Function to return the minimum cost to react at bottom
+    #right cell from top left cell.
+    def minimumCostPath(self, grid):
+        m = len(grid)
+        n = len(grid[0])
+        dis = [[float('inf') for i in range(n)] for j in range(m)]
+        dis[0][0] = grid[0][0]
+        pq = []
+        heapq.heappush(pq,[dis[0][0],0,0])
+        
+        while pq:
+            d,i,j = heapq.heappop(pq)
+            if i == m-1 and j == n-1:
+                return d
+            dr = [-1,0,1,0]
+            dc = [0,-1,0,1]
+            for k in range(4):
+                r = i + dr[k]
+                c = j + dc[k]
+                if r >= 0 and r < m and c >= 0 and c < n and d+grid[r][c] < dis[r][c]:
+                    dis[r][c] = d + grid[r][c]
+                    heapq.heappush(pq, [dis[r][c], r, c])
+        

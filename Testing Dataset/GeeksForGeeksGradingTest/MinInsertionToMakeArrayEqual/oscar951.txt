@@ -1,0 +1,50 @@
+#User function Template for python3
+from bisect import bisect_left as bl
+class Solution:
+    def findLIS2(self, a):
+        tailTable = [a[0]]
+        for i in range(1, len(a)):
+            if a[i] < tailTable[0]:
+                tailTable[0] = a[i]
+            elif a[i] > tailTable[-1]:
+                tailTable.append(a[i])
+            else:
+                tailTable[bl(tailTable, a[i])] = a[i]
+        return tailTable
+        
+    def findLIS(self, a):
+        l = [[a[0]]]
+        tailTable = [a[0]]
+        for i in range(len(a)):
+            smallest = bl(tailTable, a[i])
+            #for j in range(len(l)):
+            #    if a[i] > l[j][-1]:
+            #        smallest = j
+            if smallest == 0:
+                l[0] = [a[i]]
+                tailTable[0] = a[i]
+            elif smallest == len(l):
+                l.append(l[-1]+[a[i]])
+                tailTable.append(a[i])
+            else:
+                l[smallest] = l[smallest-1]+[a[i]]
+                tailTable[smallest] = a[i]
+        return l[-1] if l else []
+            
+    
+    def minInsAndDel(self, A, B, N, M):
+        if A == B:
+            return 0
+        count = set()
+        for el in B:
+            count.add(el)
+        new_A = []
+        for i,el in enumerate(A):
+            if el in count:
+                new_A.append(el)
+        if new_A:
+            LIS = self.findLIS2(new_A)
+            return N+M-2*len(LIS)
+        else:
+            return N+M
+        

@@ -1,0 +1,15 @@
+#User function Template for python3
+class Solution:
+    def maxXor(self, a, n):
+        array = list(a) 
+        if not array:
+            return 0
+        x = 0
+        while True:
+            y = max(array)
+            if y == 0:
+                return x
+            # y has the leading 1 in the array
+            x = max(x, x ^ y)
+            # eliminate
+            array = [min(z, z ^ y) for z in array]

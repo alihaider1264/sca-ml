@@ -1,0 +1,19 @@
+#User function Template for python3
+
+class Solution:
+    def minInsAndDel(self, nums, nums2, M, N):
+        dp = [-1] * M
+        dp[-1] = 1
+        #loops starts from the second last element
+        res = 1
+        for i in range(len(nums)-2, -1, -1):
+            temp = 1
+            for j in range(i + 1, len(nums)):
+                # print(i,dp[j])
+                if nums[j]>nums[i] and nums[j] in nums2:
+                    temp = max(temp,1 + dp[j])
+            #print(dp,i,temp)
+            dp[i] = temp
+            res = max(res,temp)
+         
+        return M + N - (2*res)

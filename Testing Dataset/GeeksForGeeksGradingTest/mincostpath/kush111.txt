@@ -1,0 +1,31 @@
+class Solution:
+    
+    #Function to return the minimum cost to react at bottom
+    #right cell from top left cell.
+    def minimumCostPath(self, mat):
+        #Code here
+        m,n = len(mat),len(mat[0])
+        from heapq import heappop,heappush
+        heap=[[mat[0][0],0,0]]
+        dist=[[10**10 for j in range(n)]for i in range(m)]
+        dist[0][0]=0
+        
+        dx = [1,0,0,-1]
+        dy = [0,1,-1,0]
+        def valid(i,j):
+            if i>m-1 or j>n-1 or i<0 or j<0:
+                return False
+            return True
+            
+        
+        while heap:
+            tmp,i,j = heappop(heap)
+            for d in range(4):
+                a,b = i+dx[d],j+dy[d]
+                if valid(a,b):
+                    if dist[a][b]>mat[a][b]+tmp:
+                        dist[a][b]=mat[a][b]+tmp
+                        heappush(heap,[dist[a][b],a,b])
+        
+        return dist[-1][-1]
+                        

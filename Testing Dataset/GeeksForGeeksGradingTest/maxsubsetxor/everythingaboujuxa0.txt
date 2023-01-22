@@ -1,0 +1,15 @@
+# function to return maximum XOR subset in set[]
+
+class Solution:
+    def maxSubsetXOR(self, arr, N):
+        # add code here
+        arr.sort()
+        g=[]
+        for y in range(N):
+            for t in range(i,N):
+                g.append(arr[y]^arr[t])
+        if len(g)==0:
+            return -1
+        else:
+            
+            return max(g)

@@ -1,0 +1,121 @@
+#User function Template for python3
+from bisect import bisect_left
+
+class Solution:
+    def minInsAndDelNaive(self, A, B, N, M):
+        # code here 
+        prev_ops = [0]*(M+1)
+        
+        for i in range(1, M+1):
+            prev_ops[i] = i
+    
+        for i in range(N):
+            curr_ops = [0]*(M+1)
+            curr_ops[0] = i+1
+            index = self.search(A[i], B, M)
+            
+            if index == -1:
+                left_val = M+1
+            else:
+                left_val = index+1            
+                
+            for j in range(1, left_val):
+                curr_ops[j] = prev_ops[j]+1
+            
+            if index != -1:
+                curr_ops[index+1] = prev_ops[index]
+            
+            for j in range(left_val+1, M+1):
+                curr_ops[j] = min(curr_ops[j-1]+1, prev_ops[j]+1)
+                
+            prev_ops = curr_ops
+        
+        return prev_ops[M]
+        
+        
+    def search(self, val, arr, N):
+        l = 0
+        r = N-1
+        while l <= r:
+            mid = l+(r-l)//2
+            if arr[mid] == val:
+                return mid
+            elif val < arr[mid]:
+                r = mid-1
+            else:
+                l = mid+1
+        return -1
+            
+    def minInsAndDel(self, A, B, N, M):
+        #DOne using LIS Longest Increasing Sub Sequence in O(nlog(n)
+        # code here 
+        #s_index = [-1]*N
+        
+        len_arr = [-1]*M
+        curr_len = 0
+        
+        for i in range(N):
+            index = bisect_left(B, A[i])
+
+            if index == M or B[index] != A[i]:
+                continue
+            
+            if curr_len == 0:
+                len_arr[curr_len] = index
+                curr_len+=1
+                continue
+            
+            elif len_arr[curr_len-1] < index:
+                len_arr[curr_len] = index
+                curr_len+=1
+            else:
+                ceil_len = bisect_left(len_arr, index, 0, curr_len)
+                len_arr[ceil_len] = index
+                #res_index[i] = len_arr[index-1] if index > 0 else -1
+        
+
+        #print(len_arr)
+        #print(res_index)
+        """
+        num_ops = 0
+        curr_i = len_arr[curr_len-1] if curr_len > 0 else -1
+        last_index = curr_i
+        while curr_i != -1:
+            prev_i = res_index[curr_i]
+            a_count = curr_i-prev_i-1
+            b_count = s_index[curr_i]- (s_index[prev_i] if prev_i > -1 else -1)-1
+            #print(a_count, b_count)
+            num_ops+=(2*min(a_count, b_count))
+            num_ops+=(max(a_count, b_count) - min(a_count, b_count))
+            curr_i = prev_i
+        
+        a_count = N - (last_index + 1)
+        b_count = M - ((s_index[last_index] if last_index > -1 else -1) +1)
+        #print(last_index, N, a_count, b_count)
+        num_ops+=(2*min(a_count, b_count))
+        num_ops+=(max(a_count, b_count) - min(a_count, b_count))        
+        return num_ops
+        """
+        return N+M-2*curr_len
+        
+        
+            
+        
+    def binary_index_search(self, len_arr, start, end, arr, val):
+        l = start
+        r = end-1
+        ans = end
+        while l <= r:
+            mid = l+(r-l)//2        
+            if arr[len_arr[mid]] >= val:
+                ans = mid
+                r = mid-1
+            else:
+                l = mid+1
+        return ans        
+        
+        
+        
+        
+               
+            

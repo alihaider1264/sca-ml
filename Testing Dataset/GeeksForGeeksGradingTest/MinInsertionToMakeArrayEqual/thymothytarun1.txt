@@ -1,0 +1,25 @@
+#User function Template for python3
+from bisect import bisect_left
+def lis(B):
+    if len(B)==0:
+        return 0
+    temp = [B[0]]
+    for i in B:
+        if i>temp[-1]:
+            temp.append(i)
+        else:
+            ind = bisect_left(temp,i,0,len(temp))
+            temp[ind] = i
+    return len(temp)
+    
+class Solution:
+    def minInsAndDel(self, A, B, N, M):
+        temp = []
+        set_B = set(B)
+        for i in A:
+            if i in set_B:
+                temp.append(i)
+                #set_B.discard(i)
+        l = lis(temp)
+        return N+M - (2*l)
+        

@@ -1,0 +1,47 @@
+
+
+
+import heapq
+#User function Template for python3
+class Solution:
+    def __init__(self):
+        self.MAX=100000001
+        self.heapQ=list()
+        
+    #Function to return the minimum cost to react at bottom right cell from top left cell.
+    def minimumCostPath(self, grid):
+        #Code here
+        N=len(grid)
+        result=[ [self.MAX for i in range(N)] for i in range(N) ]
+        visited=[ [False for i in range(N)] for i in range(N) ]
+        i=j=0
+        self.bfs(i,j,grid,result,visited,N)
+        return result[N-1][N-1]
+
+    # this is main BFS Function, to solve using heapq module
+    def bfs(self,i,j,grid,result,visited,N):
+        result[i][j]=grid[i][j]
+        # because we want minimum cost in top...
+        # thats why we put cost first, then i and then j...
+        data=[grid[i][j],0,0]
+        heapq.heappush(self.heapQ,data)
+        # loop runs till the self.heapQ to be empty...
+        while(self.heapQ):
+            value,i,j=heapq.heappop(self.heapQ)
+            visited[i][j]=True
+            newData = [[i-1,j],[i+1,j],[i,j-1],[i,j+1]]
+            for i_,j_ in newData:
+                # if you cross borders, then never enter on heapq...
+                if(i_<0 or i_>=n or j_<0 or j_>=n):
+                    continue
+                # if this i_ and j_ not visited (if already visited then we not again work on it)...
+                # and its result value is greater then, i and j's result +  i_ and j_ grid...
+                if(visited[i_][j_]==False and result[i_][j_]>value+grid[i_][j_]):
+                    result[i_][j_]=value+grid[i_][j_]
+                    data=[result[i_][j_],i_,j_]
+                    heapq.heappush(self.heapQ,data)
+        return None
+            
+
+        
+

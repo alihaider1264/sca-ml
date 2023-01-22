@@ -1,0 +1,15 @@
+t=int(input())
+for _ in range(t):
+    n=int(input())
+    ele=list(map(int,input().split()))
+    Maximum=-1
+    for i in range(len(ele)):
+        for j in range(i,len(ele)):
+            Max=(ele[i]^ele[j])
+            if Max>Maximum:
+                Maximum=Max 
+    if(len(ele)==1):
+        print(ele[0])
+    else:
+        print(Maximum)
+            

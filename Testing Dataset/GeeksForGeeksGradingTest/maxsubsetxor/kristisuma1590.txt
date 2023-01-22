@@ -1,0 +1,11 @@
+# function to return maximum XOR subset in set[]
+
+class Solution:
+    def maxSubsetXOR(self, arr, N):
+        ma=0
+        for i in range(N-1):
+            for j in range(i+1,N):
+                m=arr[i]^arr[j]
+            ma=max(ma,m)
+        return ma
+                

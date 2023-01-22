@@ -1,0 +1,45 @@
+#User function Template for python3
+
+'''
+class Node:
+    def __init__(self, val):
+        self.right = None
+        self.data = val
+        self.left = None
+'''
+
+class Solution:
+    
+    def inorder(self,ro,ar):
+        if ro.left:
+            self.inordre(ro.left,ar)
+        ar.append(ro.data)
+        if ro.right:
+            self.inorder(ro.right,ar)
+    def merge(self, root1, root2):
+        
+        #code here.
+        arr1=[]
+        arr2=[]
+        arr=[]
+        return arr1
+        self.inorder(root1,arr1)
+        self.inorder(root2,arr2)
+        i=0
+        j=0
+        n1=len(arr1)
+        n2=len(arr2)
+        while (i<n1 and j<n2):
+            if arr1[i]<=arr[j]:
+                arr.append(arr1[i])
+                i+=1
+            else:
+                arr.append(arr2[j])
+                j+=1
+        while i<n1:
+            arr.append(arr1[i])
+            i+=1
+        while j<n2:
+            arr.append(arr2[j])
+            j+=1
+        return arr

@@ -1,0 +1,33 @@
+from collections import deque 
+import math
+class Solution:
+    
+    #Function to return the minimum cost to react at bottom
+    #right cell from top left cell.
+    
+    def minimumCostPath(self, grid):
+        #Code here
+        n = len(grid)
+        m = len(grid[0])
+        direc = [[-1,0],[1,0],[0,-1],[0,1]]
+        gsum = [[math.inf for j in range(m)] for i in range(n)]
+        gsum[n-1][m-1] = grid[n-1][m-1]
+        queue = deque()
+        queue.append((n-1,m-1))
+        while len(queue)>0:
+            i,j = queue.popleft()
+     
+            for di in direc:
+                x = i+di[0]
+                y = j+di[1]
+                
+                if x>=0 and x<n and y>=0 and y<m:
+                    if gsum[x][y]>grid[x][y]+gsum[i][j]:
+                        gsum[x][y] = grid[x][y]+gsum[i][j]
+                        if (x,y) not in queue:
+                            queue.append((x,y))
+                        
+        return gsum[0][0]
+                
+        
+        

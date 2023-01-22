@@ -1,0 +1,30 @@
+#User function Template for python3
+
+class Solution:
+    def solveWordWrap(self, nums, K):
+        #Code here
+        
+        n = len(nums)
+        
+        total_cost = 0
+        
+        for i in range(n - 2):
+            
+            size = K - 1 - nums[i]
+            sum = K - nums[i]
+            
+            while size >= 0:
+              #  the next line will basically check for another sentence can be added to the present line or not
+              # -1 denotes the space that is going to be added while adding another sentence
+                size = size - nums[i+1] - 1
+                
+                if size < 0:
+                    break
+                
+                sum = sum - nums[i] - 1
+                
+                i = i + 1
+            
+            total_cost = total_cost + (sum * sum)
+        
+        return total_cost

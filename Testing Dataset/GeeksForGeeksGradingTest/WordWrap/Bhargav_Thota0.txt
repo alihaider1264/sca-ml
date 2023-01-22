@@ -1,0 +1,30 @@
+#User function Template for python3
+
+import functools
+
+
+class Solution:
+    def solveWordWrap(self, words, m):
+        
+        n=len(words)
+        
+        
+        def square(i):
+            return i*i
+            
+        
+        @functools.lru_cache(None)
+        def fun(i, remL):
+            if i==n-1:
+                return 0 if words[-1]<remL else square(remL)
+                
+            
+            opt1=float('inf')
+            if words[i]<remL:
+                opt1=fun(i+1, remL-words[i] if remL==m else remL-words[i]-1)
+                
+            
+            opt2=square(remL)+fun(i+1, m-words[i])
+            return min(opt1, opt2)
+            
+        return fun(0, m)        

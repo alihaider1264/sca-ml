@@ -1,0 +1,27 @@
+#User function Template for python3
+
+class Solution:
+    def solveWordWrap(self, nums, k):
+        t = [[-1 for i in range(2005)] for j in range(505)]
+        
+        def solve(i, rem, nums, k):
+            if(i == len(nums)):
+                return 0
+                
+            if(t[i][rem] != -1):
+                return t[i][rem]
+            
+            ans = 0
+            
+            if(nums[i] > rem):
+                ans = (rem+1)*(rem+1) + solve(i+1, k-nums[i]-1, nums, k)
+            else:
+                choice1 = (rem+1)*(rem+1) + solve(i+1, k-nums[i]-1, nums, k)
+                choice2 = solve(i+1, rem-nums[i]-1, nums, k)
+                ans = min(choice1, choice2)
+            
+            t[i][rem] = ans
+            return t[i][rem]
+            
+        ans = solve(0,k,nums,k)
+        return ans
