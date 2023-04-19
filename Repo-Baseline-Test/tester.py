@@ -28,9 +28,14 @@ import sys
 import re
 import pickle
 from keras.utils import pad_sequences
+import numpy as np
+from keras.models import load_model
+import json
+
 
 
 #Idealy we would want to use a file which contains the processing required as a library, but it is stuck in a Jupyter Notebook for now. 
+slashForDir = "\\"
 
 #MODEL OPTIONS
 noSimilarization = False
@@ -43,7 +48,17 @@ enableLengthLimit = True
 autopep8FixTimeLimit = 10 #seconds
 class gradeType:
     fileName : str
-    grade : float
+    grade : Number
+    
+    
+class modelWithEverythingNeeded:
+    model : load_model
+    tokenizer : pickle
+    modelInfo : json
+    
+    
+    
+    
 def searchFileFormat(path, fileformats):
     filesToDo = []
     for root, dirs, files in os.walk(path):
@@ -69,9 +84,9 @@ def pythonProcessing(inputString):
     inputString = re.sub(regexBlankLineMostly, '', inputString, 0, re.MULTILINE)
     inputString = re.sub(regexBlankLineFinish, '', inputString, 0, re.MULTILINE)
     return inputString
-def pythonTokenizing(inputString , tokenizer):
-    tokens = tokenizer.texts_to_sequences([inputString])
-    tokens = pad_sequences(tokens, maxlen=X.shape[1])
+def pythonTokenizing(inputString , modelWInfo):
+    tokens = modelWInfo.tokenizer.texts_to_sequences([inputString])
+    tokens = pad_sequences(tokens, modelWInfo.modelInfo['maxLen'])
     return tokens
 def pythonPadding(dataSet, to_pad = ['\n', '\t', '\r', '(', ')', '[', ']', '{', '}', '<', '>', '!', '?', ',', '.', ':', ';', '`', '~', '@', '#', '$', '%', '^', '&', '*', '=', '+', '/', '\\', '|']):
     #tokenize dataSet
@@ -169,30 +184,79 @@ def change_names(code):
   return new_code
 def findFoldersToGrade(path):
     folders = []
-    for root, dirs, files in os.walk(path):
-        for name in dirs:
-            folders.append(os.path.join(root, name))
+    for root, dirs, files in os.walk(path+slashForDir+"parsed"):
+        if (root != path+slashForDir+"parsed"):
+            for name in dirs:
+                    folders.append(os.path.join(root, name))
     return folders
-def gradeFolder(path, output, model, tokenizer):
+def gradeFolder(path, modelWInfo):
     grades = []
     #will be searching for .txt files
     for file in searchFileFormat(path, [".txt"]):
-        gradeFile(path + file, output, nn)   
-def gradeFile(path, output, model, tokenizer, ):
-    tokens = pythonTokenizing(pythonPadding(change_names(readFile(path))), tokenizer)
-    model.predict(tokens).tolist()[0][0]
-    gradeValue = 0
-    grade = gradeType()
-    gradeType.grade = gradeValue
-    gradeType.fileName = path.split("/")[-1].split(".")[0]
-    return grade
+        print (path + file)
+        newGrade = gradeType()
+        try:
+            newGrade.grade = gradeFile(path + file, modelWInfo)
+            newGrade.fileName = file.split(".")[0]
+            grades.append(newGrade)
+        except:
+            print("skipped file")
+    for gradeValue in grades:
+        print(gradeValue.fileName + "  " + str(gradeValue.grade))
+    return grades
+    
+        
+def gradeFile(path, modelWInfo):
+    tokens = pythonTokenizing(pythonPadding(change_names(readFile(path))), modelWInfo)
+    gradeValue = modelWInfo.model.predict(tokens).tolist()[0][0]
+    return gradeValue
+def readFile(path):
+    file = open(path, "r")
+    filecontents = file.read()
+    file.close()
+    return filecontents
 
 def main():
     parser = argparse.ArgumentParser(description='A grading utility for testing, please open the source file and read Outline for more info.')
     parser.add_argument('-p', '--path', help='The path to the repository to run grades on. Please make this the folder with data already parsed into seperet files. By default this is the "Parsed" folder for a repository.', required=True)
     parser.add_argument('-o', '--output', help='The path to the output folder.', required=True)
-    parser.add_argument('-m', '--model', help='The path to the model to use.', required=True)
-    parser.add_argument('-t', '--tokenizer', help='The path to the tokenizer to use.', required=True)
+    parser.add_argument('-m', '--model', help='The path to the model folder.', required=True)
+    pathToModel = parser.parse_args().model
+    #load tokenizer
+    with open(pathToModel + slashForDir + 'tokenizer.pickle', 'rb') as handle:
+        tokenizer = pickle.load(handle)
     
+    #load model
+    model = load_model(pathToModel + slashForDir + 'model.h5')
     
+    #load model info 
+    with open(pathToModel + slashForDir + 'modelInfo.json') as json_file:
+        modelInfo = json.load(json_file)
+        
+    folderToGrade = findFoldersToGrade(parser.parse_args().path)
+
     
+    modelWInfo = modelWithEverythingNeeded()
+    modelWInfo.model = model
+    modelWInfo.tokenizer = tokenizer
+    modelWInfo.modelInfo = modelInfo
+    for folder in folderToGrade:
+        #main loop of the program
+        grade = gradeFolder(folder, modelWInfo)
+        #write to file
+        #create folder if it does not exist
+        
+        if not os.path.exists(parser.parse_args().output + slashForDir + folder.split("parsed" + slashForDir)[1]):
+            os.makedirs(parser.parse_args().output + slashForDir + folder.split("parsed" + slashForDir)[1])
+        
+        file = open(parser.parse_args().output + slashForDir + folder.split("parsed" + slashForDir)[1] + slashForDir + folder.split(slashForDir)[-1] + ".txt", "w")
+
+        #file = open(parser.parse_args().output + slashForDir + folder.split(slashForDir)[-2] + ".txt", "w")
+        for gradeValue in grade:
+            file.write(gradeValue.fileName + "|" + str(gradeValue.grade) + "\n")
+        file.close()
+        
+        
+        
+        
+main()
