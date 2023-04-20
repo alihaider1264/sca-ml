@@ -73,7 +73,7 @@ def generateLogs(filestodo,rootpath,outputpath,usemethods,hashes):
                 incnumb += 1
         else:
             outputname = str(file).split("\\")[len(str(file).split("\\")) - 1].split(".")[0] +".gitlog"
-            process1 = subprocess.run("cd /d " + rootpath + " && git --no-pager log --no-notes --patch -U100000000000 \"." + file + "\"" + " > "+ outputpath +"\\" +  outputname, shell=True)
+            process1 = subprocess.run("cd /d " + rootpath + " && git --no-pager log --patch -U99999999999999999 \"." + file + "\"" + " > "+ outputpath +"\\" +  outputname, shell=True)
             with open(outputpath +"\\" + outputname, 'r' , encoding="utf8") as f:
                 try:
                     data = f.read()

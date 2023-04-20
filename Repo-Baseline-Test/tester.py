@@ -36,6 +36,7 @@ import json
 
 #Idealy we would want to use a file which contains the processing required as a library, but it is stuck in a Jupyter Notebook for now. 
 slashForDir = "\\"
+multiRepoFolder = False
 
 #MODEL OPTIONS
 noSimilarization = False
@@ -193,7 +194,6 @@ def gradeFolder(path, modelWInfo):
     grades = []
     #will be searching for .txt files
     for file in searchFileFormat(path, [".txt"]):
-        print (path + file)
         newGrade = gradeType()
         try:
             newGrade.grade = gradeFile(path + file, modelWInfo)
@@ -201,8 +201,8 @@ def gradeFolder(path, modelWInfo):
             grades.append(newGrade)
         except:
             print("skipped file")
-    for gradeValue in grades:
-        print(gradeValue.fileName + "  " + str(gradeValue.grade))
+    #sort by file name number
+    grades.sort(key=lambda x: int(x.fileName.split(slashForDir)[1]))
     return grades
     
         
@@ -222,6 +222,7 @@ def main():
     parser.add_argument('-o', '--output', help='The path to the output folder.', required=True)
     parser.add_argument('-m', '--model', help='The path to the model folder.', required=True)
     pathToModel = parser.parse_args().model
+    multiRepoFolder = os.path.exists(pathToModel + slashForDir + 'parser')
     #load tokenizer
     with open(pathToModel + slashForDir + 'tokenizer.pickle', 'rb') as handle:
         tokenizer = pickle.load(handle)

@@ -40,6 +40,7 @@ def parse_commit_log(log):
     commits = []
     current_commit = None
     incommit = False
+    invalidContent = False
     for line in log.split('\n'):
         #skip the line if it has invalid characters
         if not line.isascii():
@@ -49,11 +50,16 @@ def parse_commit_log(log):
                 commits.append(current_commit)
                 current_commit = None
                 incommit = False
+                invalidContent = False
             current_commit = {}
             current_commit['hash'] = line.split()[1]
             current_commit['commitcontent'] = ''
         elif incommit:
-            current_commit['commitcontent'] =  str(current_commit['commitcontent']) + str(parse_commit_diff(line)) + '\n'
+            #For some reason git log likes to duplicate itself? This is a hacky fix
+            if line.startswith("@@"):
+                invalidContent = True
+            if not invalidContent:
+                current_commit['commitcontent'] =  str(current_commit['commitcontent']) + str(parse_commit_diff(line)) + '\n'
         elif line.startswith('Author:'):
             current_commit['author'] = line.split(':')[1].strip()
         elif line.startswith('Date:'):
