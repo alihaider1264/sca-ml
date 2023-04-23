@@ -42,7 +42,7 @@ multiRepoFolder = False
 noSimilarization = False
 
 #CODE SIMILARIZATION CONFIG VALUES
-skipErrorCorrection = False
+skipErrorCorrection = True
 lengthLimitmb = .05
 lengthLimitBytes = lengthLimitmb * 1000000
 enableLengthLimit = True
@@ -183,12 +183,26 @@ def change_names(code):
   
 
   return new_code
-def findFoldersToGrade(path):
+def findFoldersToGrade(path,multiRepo):
     folders = []
-    for root, dirs, files in os.walk(path+slashForDir+"parsed"):
-        if (root != path+slashForDir+"parsed"):
-            for name in dirs:
-                    folders.append(os.path.join(root, name))
+    folderToSearch = []
+    
+    if multiRepo:
+        for files in os.listdir(path):
+            if os.path.isdir(os.path.join(path, files)):
+                if (os.path.isdir(os.path.join(path, files, "parsed"))):
+                    folderToSearch.append(path + slashForDir +  files)
+    else: 
+        folderToSearch.append(path)
+    for folder in folderToSearch:
+      for root, dirs, files in os.walk(folder+slashForDir+"parsed"):
+          if (root != path+slashForDir+"parsed"):
+              for name in dirs:
+                      if (multiRepo): #hacky fix for multiRepo, fix later
+                        unwantedFolders = os.listdir(path + slashForDir + folder.split(slashForDir)[-1]+ slashForDir + "parsed")
+                        if (name in unwantedFolders):
+                          continue
+                      folders.append(os.path.join(root, name))
     return folders
 def gradeFolder(path, modelWInfo):
     grades = []
@@ -202,12 +216,12 @@ def gradeFolder(path, modelWInfo):
         except:
             print("skipped file")
     #sort by file name number
-    grades.sort(key=lambda x: int(x.fileName.split(slashForDir)[1]))
+    grades.sort(key=lambda x: int(x.fileName.split(slashForDir)[-1]))
     return grades
     
         
 def gradeFile(path, modelWInfo):
-    tokens = pythonTokenizing(pythonPadding(change_names(readFile(path))), modelWInfo)
+    tokens = pythonTokenizing(pythonPadding(pythonProcessing(readFile(path))), modelWInfo)
     gradeValue = modelWInfo.model.predict(tokens).tolist()[0][0]
     return gradeValue
 def readFile(path):
@@ -222,7 +236,10 @@ def main():
     parser.add_argument('-o', '--output', help='The path to the output folder.', required=True)
     parser.add_argument('-m', '--model', help='The path to the model folder.', required=True)
     pathToModel = parser.parse_args().model
-    multiRepoFolder = os.path.exists(pathToModel + slashForDir + 'parser')
+    multiRepoFolder = not os.path.exists(parser.parse_args().path + slashForDir + 'parsed')
+    print (multiRepoFolder)
+    
+    
     #load tokenizer
     with open(pathToModel + slashForDir + 'tokenizer.pickle', 'rb') as handle:
         tokenizer = pickle.load(handle)
@@ -234,7 +251,7 @@ def main():
     with open(pathToModel + slashForDir + 'modelInfo.json') as json_file:
         modelInfo = json.load(json_file)
         
-    folderToGrade = findFoldersToGrade(parser.parse_args().path)
+    folderToGrade = findFoldersToGrade(parser.parse_args().path, multiRepoFolder)
 
     
     modelWInfo = modelWithEverythingNeeded()
@@ -242,15 +259,18 @@ def main():
     modelWInfo.tokenizer = tokenizer
     modelWInfo.modelInfo = modelInfo
     for folder in folderToGrade:
+      grade = gradeFolder(folder, modelWInfo)
+      if (len(grade) > 1):
         #main loop of the program
-        grade = gradeFolder(folder, modelWInfo)
         #write to file
         #create folder if it does not exist
+        reponame = folder.split("parsed" + slashForDir)[0].split(slashForDir)[-2]
+        dirString = parser.parse_args().output + slashForDir + reponame + slashForDir +  folder.split("parsed" + slashForDir)[1]
+        print (dirString + "\n")
+        if not os.path.exists(dirString):
+            os.makedirs(dirString)
         
-        if not os.path.exists(parser.parse_args().output + slashForDir + folder.split("parsed" + slashForDir)[1]):
-            os.makedirs(parser.parse_args().output + slashForDir + folder.split("parsed" + slashForDir)[1])
-        
-        file = open(parser.parse_args().output + slashForDir + folder.split("parsed" + slashForDir)[1] + slashForDir + folder.split(slashForDir)[-1] + ".txt", "w")
+        file = open(dirString + slashForDir + folder.split(slashForDir)[-1] + ".txt", "w")
 
         #file = open(parser.parse_args().output + slashForDir + folder.split(slashForDir)[-2] + ".txt", "w")
         for gradeValue in grade:
